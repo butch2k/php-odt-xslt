@@ -39,37 +39,36 @@ class Odt2Html {
 	public function render_inline_images()
 	{
 		$html = $this->html;
-
 		preg_match_all('/Pictures\/.*?.png/', $html, $matches);
 		$img_files = $matches[0];
-
 		$img_files_src = array();
-
 		foreach($img_files as $img_file) {
 			$img_files_src[$img_file] = $this->odt_picture_to_inline_img($this->odtZipfilename, $img_file);
 		}
-
 		foreach($img_files as $img_file) {
 			$html = str_replace($img_file, $img_files_src[$img_file], $html);
 		}
-
 		$this->html = $html;
-
 		return $this;
 	}
 
+	public function save_to_htmlfile($filename, $utf8=TRUE)
+	{
+		file_put_contents($filename, $this->get_html($utf8));
+		return $this;
+	}
+	
 	//------------------------------------------------------------------------------------------
 	// Methods
 	//------------------------------------------------------------------------------------------
 
-	public function get_html()
+	public function get_html($utf8=TRUE, $utf8header=TRUE)
 	{
-		return $this->html;
-	}
-
-	public function get_html_utf8()
-	{
-		return utf8_decode($this->html);
+		$html = ($utf8header) 
+		? '<meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />' . PHP_EOL . $this->html 
+		: $this->html;
+		
+		return ($utf8) ? $html : utf8_decode($html);
 	}
 
 	//--------------------------------------------------------------------------------------------------
